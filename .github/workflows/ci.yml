@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - develop
-      - /^release\/v?(\d|\.)*/
+      - /^release\/v?(\d|\.)+/
     tags:
-      - /v?(\d|\.)*/
+      - /v?(\d|\.)+/
   pull_request:
     branches:
       - develop
