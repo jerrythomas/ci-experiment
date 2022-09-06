@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - develop
-      - /^release\/v?(\d|\.)*/
+      - 'release/v?[0-9].[0-9].[0-9]'
     tags:
-      - /v?(\d|\.)*/
+      - /v?(\d|\.)+/
   pull_request:
     branches:
       - develop
@@ -15,17 +15,35 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      - name: version and env from branch
+        if: github.ref_type == 'branch'
+        run: |
+          ENV=`echo "${{ github.ref }}" | cut -d/ -f3`
+          VER=`echo "${{ github.ref }}" | cut -d/ -f4`
+          VER=${VER:-$ENV}
+          echo "${VER}"
+          echo "${ENV}"
+      - name: Version and env from tag
+        if: github.ref_type == 'tag'
+        run: |
+          echo ${{ github.ref }}
+          VER=`echo "${{ github.ref }}" | cut -d/ -f3`
+          ENV=uat
+          echo "${VER}"
+          echo "${ENV}"
 
+      - run: echo ${{ github.ref == 'refs/heads/develop' }}
       - name: Configure Build
         run: |
           TARGET_ENV=prod
-          if [ {{ github.ref_type == 'branch' }} && {{ github.ref != 'develop' }}]; then
-             IMAGE_TAG=`echo ${{ github.ref }} | cut -d/ -f4`
-             TARGET_ENV=uat
-          else
-             IMAGE_TAG=`echo ${{ github.ref }} | cut -d/ -f3`
-             if [ {{ github.ref_type == 'branch' }} ]; then
+          IMAGE_TAG=`echo "${{ github.ref }}" | cut -d/ -f3`
+
+          if [ "{{ github.ref_type }}" = "branch"  ]; then
+             if [ "{{ github.ref }}" = "refs/heads/develop" }} ]; then
                 TARGET_ENV=dev
+             else
+                IMAGE_TAG=`echo "${{ github.ref }}" | cut -d/ -f4`
+                TARGET_ENV=uat
              fi
           fi
 
