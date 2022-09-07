@@ -44,7 +44,6 @@ jobs:
           if [ "${VERSION_TAG}" != "${IMAGE_TAG}" ]; then
              echo "add image tag to container and push"
           fi
-          - name: Login to Amazon ECR
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
