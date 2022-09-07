@@ -69,6 +69,8 @@ jobs:
           echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
 
       - name: Service and task names
+        env:
+          APP_NAME: ${{secrets.APP_NAME}}
         id: prefix
         run: |
           ENV_PREFIX=$IMAGE_TAG
@@ -77,8 +79,8 @@ jobs:
           elif [ "$IMAGE_TAG" = "release" ]; then
              ENV_PREFIX="uat"
           fi
-          echo "::set-output name=service::${ENV_PREFIX}-api"
-          echo "::set-output name=task-file::${ENV_PREFIX}-api.json"
+          echo "::set-output name=service::${ENV_PREFIX}-${APP_NAME}"
+          echo "::set-output name=task-file::.github/workflows/${ENV_PREFIX}-${APP_NAME}.json"
 
       - name: show output
         run: |
@@ -92,7 +94,7 @@ jobs:
         env:
           AWS_ACCOUNT_ID: ${{ steps.build-docker-image.outputs.account }}
           IMAGE: ${{ steps.build-docker-image.outputs.image }}
-          TASK_FILE: .github/workflows/dev-api.json
+          TASK_FILE: ${{ steps.prefix.outputs.task-file }}
           SERVICE_NAME: ${{ steps.prefix.outputs.service }}
 
       # - name: Fill in the new image ID in the Amazon ECS task definition
