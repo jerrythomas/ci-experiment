@@ -33,17 +33,7 @@ jobs:
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
           echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_ENV
 
-      - name: Build and push
-        run: |
-          if [ "${{env.IMAGE_TAG}}" = "prod" ]; then
-             echo "pull VERSIoN TAG"
-          else
-             echo "build image for version tag and push"
-          fi
 
-          if [ "${VERSION_TAG}" != "${IMAGE_TAG}" ]; then
-             echo "add image tag to container and push"
-          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -56,14 +46,18 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: show output
+      - name: Build, tag, and push docker image to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: my-ecr-repo
         run: |
-           echo ${{ steps.login-ecr.outputs.registry }}
-           echo ${{ secrets.APP_NAME }}
-      # - name: Build, tag, and push docker image to Amazon ECR
-      #   env:
-      #     REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     REPOSITORY: my-ecr-repo
-      #   run: |
-      #     docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
-      #     docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          if [ "${{env.IMAGE_TAG}}" = "prod" ]; then
+             echo "docker pull $REGISTRY/$REPOSITORY:$VERSION_TAG"
+          else
+             echo "docker build -t $REGISTRY/$REPOSITORY:$VERSION_TAG ."
+             echo "docker push $REGISTRY/$REPOSITORY:$VERSION_TAG"
+          fi
+          if [ "${VERSION_TAG}" != "${IMAGE_TAG}" ]; then
+             echo "docker tag $REGISTRY/$REPOSITORY:$VERSION_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG "
+             echo "docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG"
+          fi
