@@ -69,12 +69,12 @@ jobs:
           elif [ "$IMAGE_TAG" = "release" ]; then
              ENV_PREFIX="uat"
           fi
-          echo "::set-output service-name=${ENV_PREFIX}-${{ secrets.APP_NAME }}"
+          echo "::set-output svc-name=${ENV_PREFIX}-${{ secrets.APP_NAME }}"
           echo "::set-output task-file=${ENV_PREFIX}-${{ secrets.APP_NAME }}.json"
       - name: display output
         run: |
-          echo ${{ steps.prefix.outputs.service-name }}
-          echo ${{ steps.prefix.outputs.task-file }}
+          echo {{ steps.prefix.outputs.svc-name }}
+          echo {{ steps.prefix.outputs.task-file }}
 
       # - name: Fill in the new image ID in the Amazon ECS task definition
       #   id: task-def
@@ -88,6 +88,6 @@ jobs:
       #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       #   with:
       #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-      #     service: ${{ steps.prefix.outputs.service-name }}
+      #     service: ${{ steps.prefix.outputs.svc-name }}
       #     cluster: primary
       #     wait-for-service-stability: true
