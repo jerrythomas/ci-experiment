@@ -61,7 +61,7 @@ jobs:
              echo "docker tag $REGISTRY/$REPOSITORY:$VERSION_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG "
              echo "docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG"
           fi
-          echo "::set-output account=$AWS_ACCOUNT_ID"
+          echo "::set-output name=account::$AWS_ACCOUNT_ID"
           echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
 
       - name: Service and task names
@@ -73,8 +73,8 @@ jobs:
           elif [ "$IMAGE_TAG" = "release" ]; then
              ENV_PREFIX="uat"
           fi
-          echo "::set-output svc-name=${ENV_PREFIX}-${{ secrets.APP_NAME }}"
-          echo "::set-output task-file=${ENV_PREFIX}-${{ secrets.APP_NAME }}.json"
+          echo "::set-output name=service::${ENV_PREFIX}-${{ secrets.APP_NAME }}"
+          echo "::set-output name=task-file::${ENV_PREFIX}-${{ secrets.APP_NAME }}.json"
 
       - name: show output
         run: |
@@ -88,7 +88,7 @@ jobs:
           AWS_ACCOUNT_ID: ${{ steps.build-docker-image.outputs.account }}
           IMAGE: ${{ steps.build-docker-image.outputs.image }}
           TASK_FILE: ${{ steps.prefix.outputs.task-file }}
-          SERVICE_NAME: ${{ steps.prefix.outputs.svc-name }}
+          SERVICE_NAME: ${{ steps.prefix.outputs.service }}
 
       # - name: Fill in the new image ID in the Amazon ECS task definition
       #   id: task-def
