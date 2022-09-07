@@ -87,7 +87,7 @@ jobs:
         env:
           AWS_ACCOUNT_ID: ${{ steps.build-docker-image.outputs.account }}
           IMAGE: ${{ steps.build-docker-image.outputs.image }}
-          TASK_FILE: ${{ steps.prefix.outputs.task-file }}
+          TASK_FILE: ./dev-api.json
           SERVICE_NAME: ${{ steps.prefix.outputs.service }}
 
       # - name: Fill in the new image ID in the Amazon ECS task definition
