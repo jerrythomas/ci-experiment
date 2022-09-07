@@ -32,9 +32,17 @@ jobs:
           IMAGE_TAG="prod"
           echo "${VERSION_TAG}"
           echo "${IMAGE_TAG}"
+      - name: Variables in next step
+        run: |
+          echo "${VERSION_TAG}"
+          echo "${IMAGE_TAG}"
+          echo "${{env.VERSION_TAG}}"
+          echo "${{env.IMAGE_TAG}}"
+          echo "{{env.VERSION_TAG}}"
+          echo "{{env.IMAGE_TAG}}"
       - name: Docker
         run: |
-          if [ "${IMAGE_TAG}" = "prod" ]; then
+          if [ "${{env.IMAGE_TAG}}" = "prod" ]; then
              echo "pull VERSIoN TAG"
           else
              echo "build image for version tag and push"
@@ -43,5 +51,5 @@ jobs:
           if [ "${VERSION_TAG}" != "${IMAGE_TAG}" ]; then
              echo "add image tag to container and push"
           else
-             echo "${VERSION_TAG} = ${IMAGE_TAG}"
+             echo "${{env.VERSION_TAG}} = ${{env.IMAGE_TAG}}"
           fi
