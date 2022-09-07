@@ -49,7 +49,7 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: my-ecr-repo
+          REPOSITORY: ${{ secrets.APP_NAME }}
         run: |
           if [ "${{env.IMAGE_TAG}}" = "prod" ]; then
              echo "docker pull $REGISTRY/$REPOSITORY:$VERSION_TAG"
