@@ -34,12 +34,14 @@ jobs:
           echo "${IMAGE_TAG}"
       - name: Docker
         run: |
-          if [ "$IMAGE_TAG" = "prod" ]; then
+          if [ "${IMAGE_TAG}" = "prod" ]; then
              echo "pull VERSIoN TAG"
           else
              echo "build image for version tag and push"
           fi
 
-          if [ "${VERSION_TAG}" != "$IMAGE_TAG" ]; then
+          if [ "${VERSION_TAG}" != "${IMAGE_TAG}" ]; then
              echo "add image tag to container and push"
+          else
+             echo "${VERSION_TAG} = ${IMAGE_TAG}"
           fi
