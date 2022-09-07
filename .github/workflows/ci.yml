@@ -44,10 +44,12 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build, tag, and push docker image to Amazon ECR
+        id: build-docker-image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ secrets.APP_NAME }}
         run: |
+          AWS_ACCOUNT_ID=`echo $REGISTRY | cut -d. -f1`
           if [ "${{env.IMAGE_TAG}}" = "prod" ]; then
              echo "docker pull $REGISTRY/$REPOSITORY:$VERSION_TAG"
           else
@@ -58,6 +60,7 @@ jobs:
              echo "docker tag $REGISTRY/$REPOSITORY:$VERSION_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG "
              echo "docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG"
           fi
+          echo "::set-output account=$AWS_ACCOUNT_ID"
           echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
 
       - name: Service and task names
@@ -71,6 +74,20 @@ jobs:
           fi
           echo "::set-output svc-name=${ENV_PREFIX}-${{ secrets.APP_NAME }}"
           echo "::set-output task-file=${ENV_PREFIX}-${{ secrets.APP_NAME }}.json"
+
+      - name: show output
+        run: |
+          echo $AWS_ACCOUNT_ID
+          echo $IMAGE
+          echo $TASK_FILE
+          echo $SERVICE_NAME
+          sed -i "s/AWS_ACCOUNT_ID/${AWS_ACCOUNT_ID}/g" ${TASK_FILE}
+          cat ${TASK_FILE}
+        env:
+          AWS_ACCOUNT_ID: ${{ steps.build-docker-image.outputs.account }}
+          IMAGE: ${{ steps.build-docker-image.outputs.image }}
+          TASK_FILE: ${{ steps.prefix.outputs.task-file }}
+          SERVICE_NAME: ${{ steps.prefix.outputs.svc-name }}
 
       # - name: Fill in the new image ID in the Amazon ECS task definition
       #   id: task-def
