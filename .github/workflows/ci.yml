@@ -73,8 +73,8 @@ jobs:
           elif [ "$IMAGE_TAG" = "release" ]; then
              ENV_PREFIX="uat"
           fi
-          echo "::set-output name=service::${ENV_PREFIX}-${{ secrets.APP_NAME }}"
-          echo "::set-output name=task-file::${ENV_PREFIX}-${{ secrets.APP_NAME }}.json"
+          echo "::set-output name=service::${ENV_PREFIX}-api"
+          echo "::set-output name=task-file::${ENV_PREFIX}-api.json"
 
       - name: show output
         run: |
