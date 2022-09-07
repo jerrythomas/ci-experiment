@@ -1,0 +1,169 @@
+{
+  "executionRoleArn": "arn:aws:iam::AWS_ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/dev-scheduler",
+          "awslogs-region": "us-west-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "portMappings": [
+        {
+          "hostPort": 8080,
+          "protocol": "tcp",
+          "containerPort": 8080
+        }
+      ],
+      "cpu": 0,
+      "environment": [
+        {
+          "name": "APNS_TOPIC",
+          "value": "com.dayamed.va"
+        },
+        {
+          "name": "CACHE_REDIS_HOST",
+          "value": "dev-cache.dayamed.internal"
+        },
+        {
+          "name": "CACHE_REDIS_PASSWORD",
+          "value": ""
+        },
+        {
+          "name": "CACHE_REDIS_PORT",
+          "value": "6379"
+        },
+        {
+          "name": "DB_DATABASE",
+          "value": "dayamed"
+        },
+        {
+          "name": "DB_HOST",
+          "value": "dev-db.dayamed.internal"
+        },
+        {
+          "name": "DB_PORT",
+          "value": "3306"
+        },
+        {
+          "name": "DEV_HOST",
+          "value": "https://dev-app.dayamednv.com"
+        },
+        {
+          "name": "DOWNLOAD_ANDROID_APP",
+          "value": "https://play.google.com/store/apps/details?id=com.seneca.dayamed"
+        },
+        {
+          "name": "DOWNLOAD_IOS_APP",
+          "value": "https://apps.apple.com/us/app/dayamed/id1480209734?ls=1"
+        },
+        {
+          "name": "EMAIL_FROM",
+          "value": "it@senecaglobal.com"
+        },
+        {
+          "name": "EMAIL_HOST",
+          "value": "dev-smtp.dayamed.internal"
+        },
+        {
+          "name": "EMAIL_PORT",
+          "value": "25"
+        },
+        {
+          "name": "EXTERNAL_HOST_URL",
+          "value": "https://dev-api.dayamednv.com/external"
+        },
+        {
+          "name": "FDB_API_BASE_URL",
+          "value": "https://api.fdbcloudconnector.com/cc/api/v1_3/PackagedDrugs/ndcCode/Image"
+        },
+        {
+          "name": "FDB_CLIENT_ID",
+          "value": "1753"
+        },
+        {
+          "name": "LIQUIBASE_CONTEXT",
+          "value": "dev"
+        },
+        {
+          "name": "RABBIT_HOST",
+          "value": "dev-mq.dayamed.internal"
+        },
+        {
+          "name": "RABBIT_PORT",
+          "value": "5672"
+        },
+        {
+          "name": "S3_BUCKET_NAME",
+          "value": "demo-media-dev"
+        },
+        {
+          "name": "S3_ENDPOINT_URL",
+          "value": "https://demo-media-dev.s3.us-east-2.amazonaws.com"
+        },
+        {
+          "name": "SERVER_CONTEXT_PATH",
+          "value": "/scheduler"
+        },
+        {
+          "name": "SURESCRIPT_API_URL",
+          "value": "surescripts/fetchmedhis"
+        },
+        {
+          "name": "SURESCRIPT_FROM_QUALIFIER",
+          "value": "T00000000023660"
+        },
+        {
+          "name": "SURESCRIPT_TO_QUALIFIER",
+          "value": "S00000000000002"
+        }
+      ],
+      "secrets": [
+        {
+          "valueFrom": "/dev/keys/fcm_key_auth",
+          "name": "DAYAMED_NOTIFICATION_FCM_KEY_AUTH"
+        },
+        {
+          "valueFrom": "/dev/keys/fdb_secret",
+          "name": "FDB_SECRET"
+        },
+        {
+          "valueFrom": "/dev/db/password",
+          "name": "DB_PASSWORD"
+        },
+        {
+          "valueFrom": "/dev/db/user",
+          "name": "DB_USERNAME"
+        },
+        {
+          "valueFrom": "/dev/smtp/password",
+          "name": "EMAIL_PASSWORD"
+        },
+        {
+          "valueFrom": "/dev/smtp/user",
+          "name": "EMAIL_USERNAME"
+        },
+        {
+          "valueFrom": "/dev/mq/password",
+          "name": "RABBIT_PASSWORD"
+        },
+        {
+          "valueFrom": "/dev/mq/user",
+          "name": "RABBIT_USERNAME"
+        }
+      ],
+      "image": "AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/scheduler:develop",
+      "name": "dev-scheduler"
+    }
+  ],
+  "placementConstraints": [],
+  "memory": "2048",
+  "taskRoleArn": "arn:aws:iam::AWS_ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "family": "dev-scheduler",
+  "requiresCompatibilities": ["FARGATE"],
+  "networkMode": "awsvpc",
+  "cpu": "1024",
+  "volumes": []
+}

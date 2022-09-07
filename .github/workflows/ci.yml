@@ -71,10 +71,6 @@ jobs:
           fi
           echo "::set-output svc-name=${ENV_PREFIX}-${{ secrets.APP_NAME }}"
           echo "::set-output task-file=${ENV_PREFIX}-${{ secrets.APP_NAME }}.json"
-      - name: display output
-        run: |
-          echo {{ steps.prefix.outputs.svc-name }}
-          echo {{ steps.prefix.outputs.task-file }}
 
       # - name: Fill in the new image ID in the Amazon ECS task definition
       #   id: task-def
