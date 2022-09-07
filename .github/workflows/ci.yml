@@ -15,41 +15,32 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "${{ github.head_ref }}"
-      - run: echo "${{ github.base_ref }}"
-      - run: echo "${{ github.ref }}"
-      - run: echo "${{ github.ref_type }}"
-      - name: version and env from branch
+      - name: Version and env from branch
         if: github.ref_type == 'branch'
         run: |
-          ENV=`echo "${{ github.ref }}" | cut -d/ -f3`
-          VER=`echo "${{ github.ref }}" | cut -d/ -f4`
-          VER=${VER:-$ENV}
-          echo "${VER}"
-          echo "${ENV}"
+          IMAGE_TAG=`echo "${{ github.ref }}" | cut -d/ -f3`
+          VERSION_TAG=`echo "${{ github.ref }}" | cut -d/ -f4`
+          VERSION_TAG=${VERSION_TAG:-$IMAGE_TAG}
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_ENV
+
+
       - name: Version and env from tag
         if: github.ref_type == 'tag'
         run: |
-          echo ${{ github.ref }}
-          VER=`echo "${{ github.ref }}" | cut -d/ -f3`
-          ENV=uat
-          echo "${VER}"
-          echo "${ENV}"
+          VERSION_TAG=`echo "${{ github.ref }}" | cut -d/ -f3`
+          IMAGE_TAG="prod"
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_ENV
 
-      - run: echo ${{ github.ref == 'refs/heads/develop' }}
-      - name: Configure Build
+      - name: Build and push
         run: |
-          TARGET_ENV=prod
-          IMAGE_TAG=`echo "${{ github.ref }}" | cut -d/ -f3`
-
-          if [ "{{ github.ref_type }}" = "branch"  ]; then
-             if [ "{{ github.ref }}" = "refs/heads/develop" }} ]; then
-                TARGET_ENV=dev
-             else
-                IMAGE_TAG=`echo "${{ github.ref }}" | cut -d/ -f4`
-                TARGET_ENV=uat
-             fi
+          if [ "${{env.IMAGE_TAG}}" = "prod" ]; then
+             echo "pull VERSIoN TAG"
+          else
+             echo "build image for version tag and push"
           fi
 
-          echo $IMAGE_TAG
-          echo $TARGET_ENV
+          if [ "${VERSION_TAG}" != "${IMAGE_TAG}" ]; then
+             echo "add image tag to container and push"
+          fi
