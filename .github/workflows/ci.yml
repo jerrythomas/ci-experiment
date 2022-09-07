@@ -69,27 +69,25 @@ jobs:
           elif [ "$IMAGE_TAG" = "release" ]; then
              ENV_PREFIX="uat"
           fi
-          echo "::set-output service=${ENV_PREFIX}-${APP_NAME}"
-          echo "::set-output task=${ENV_PREFIX}-${APP_NAME}"
-          echo "::set-output file=${ENV_PREFIX}-${APP_NAME}.json"
+          echo "::set-output service-name=${ENV_PREFIX}-${{ secrets.APP_NAME }}"
+          echo "::set-output task-file=${ENV_PREFIX}-${{ secrets.APP_NAME }}.json"
       - name: display output
         run: |
-          echo ${{ steps.prefix.outputs.service }}
-          echo ${{ steps.prefix.outputs.task }}
-          echo ${{ steps.prefix.outputs.file }}
+          echo ${{ steps.prefix.outputs.service-name }}
+          echo ${{ steps.prefix.outputs.task-file }}
 
       # - name: Fill in the new image ID in the Amazon ECS task definition
       #   id: task-def
       #   uses: aws-actions/amazon-ecs-render-task-definition@v1
       #   with:
-      #     task-definition: ${{ steps.prefix.outputs.file }}
-      #     container-name: ${APP_NAME}
+      #     task-definition: ${{ steps.prefix.outputs.task-file }}
+      #     container-name: ${{ secrets.APP_NAME }}
       #     image: ${{ steps.build-image.outputs.image }}
 
       # - name: Deploy Amazon ECS task definition
       #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       #   with:
       #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-      #     service: ${{ steps.prefix.outputs.service }}
+      #     service: ${{ steps.prefix.outputs.service-name }}
       #     cluster: primary
       #     wait-for-service-stability: true
