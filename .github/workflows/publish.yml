@@ -7,9 +7,6 @@ on:
       - 'release/v?[0-9].[0-9].[0-9]**'
     tags:
       - 'v?[0-9].[0-9].[0-9]**'
-  pull_request:
-    branches:
-      - develop
 
 jobs:
   publish:
@@ -62,7 +59,7 @@ jobs:
              echo "docker push $REGISTRY/$REPOSITORY:$VERSION_TAG"
           fi
           if [ "${VERSION_TAG}" != "${IMAGE_TAG}" ]; then
-             echo "docker tag $REGISTRY/$REPOSITORY:$VERSION_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG "
+             echo "docker tag $REGISTRY/$REPOSITORY:$VERSION_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG"
              echo "docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG"
           fi
           echo "::set-output name=account::$AWS_ACCOUNT_ID"
@@ -83,19 +80,10 @@ jobs:
           echo "::set-output name=task-file::.github/workflows/${ENV_PREFIX}-${APP_NAME}.json"
 
       - name: show output
-        run: |
-          echo $AWS_ACCOUNT_ID
-          echo $IMAGE
-          echo $TASK_FILE
-          echo $SERVICE_NAME
-          ls -ltra
-          sed -i "s/AWS_ACCOUNT_ID/${AWS_ACCOUNT_ID}/g" ${TASK_FILE}
-          cat ${TASK_FILE}
+        run: sed -i "s/AWS_ACCOUNT_ID/${AWS_ACCOUNT_ID}/g" ${TASK_FILE}
         env:
           AWS_ACCOUNT_ID: ${{ steps.build-docker-image.outputs.account }}
-          IMAGE: ${{ steps.build-docker-image.outputs.image }}
           TASK_FILE: ${{ steps.prefix.outputs.task-file }}
-          SERVICE_NAME: ${{ steps.prefix.outputs.service }}
 
       # - name: Fill in the new image ID in the Amazon ECS task definition
       #   id: task-def
@@ -105,10 +93,10 @@ jobs:
       #     container-name: ${{ secrets.APP_NAME }}
       #     image: ${{ steps.build-image.outputs.image }}
 
-      # - name: Deploy Amazon ECS task definition
-      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      #   with:
-      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-      #     service: ${{ steps.prefix.outputs.svc-name }}
-      #     cluster: primary
-      #     wait-for-service-stability: true
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.prefix.outputs.task-file }}
+          service: ${{ steps.prefix.outputs.svc-name }}
+          cluster: primary
+          wait-for-service-stability: true
